@@ -1,4 +1,4 @@
-// Mendix VAPT Scanner — Dashboard Application
+// Universal VAPT Scanner — Dashboard Application
 let socket = null;
 let currentScanId = null;
 let currentFindings = [];

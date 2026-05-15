@@ -1,13 +1,13 @@
 {
-  "name": "mendix-vapt-scanner",
+  "name": "universal-vapt-scanner",
   "version": "1.0.0",
-  "description": "VAPT Scanner for Mendix Applications — Comprehensive Security Assessment Tool",
+  "description": "VAPT Scanner for Web Applications — Comprehensive Security Assessment Tool",
   "main": "server.js",
   "bin": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "build:exe": "pkg . --targets node18-win-x64 --out-path dist"
+    "build:exe": "npx nexe server.js -t windows-x64-14.15.3 -o dist/universal-vapt-scanner.exe -r \"public/**/*\" -r \"scanners/**/*\""
   },
   "dependencies": {
     "axios": "^1.7.2",
@@ -20,7 +20,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "author": "Mendix VAPT Team",
+  "author": "Universal VAPT Team",
   "license": "MIT",
   "pkg": {
     "assets": [

@@ -1,4 +1,4 @@
-// Mendix VAPT Scanner — Remediation Guide
+// Universal VAPT Scanner — Remediation Guide
 // Provides detailed, Mendix-specific fix instructions for each vulnerability category
 
 const REMEDIATION_GUIDES = {

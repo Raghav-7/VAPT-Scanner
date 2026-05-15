@@ -1,4 +1,4 @@
-# Mendix VAPT Scanner
+# Universal VAPT Scanner
 
 A comprehensive, automated Vulnerability Assessment and Penetration Testing (VAPT) tool specifically optimized for Mendix applications, but capable of establishing a security baseline for any web architecture.
 
@@ -13,7 +13,7 @@ A comprehensive, automated Vulnerability Assessment and Penetration Testing (VAP
 ## How to Run
 
 ### Option 1: Standalone Windows Executable (.exe)
-1. Download `mendix-vapt-scanner.exe` from the latest Releases.
+1. Download `universal-vapt-scanner.exe` from the latest Releases.
 2. Double-click the file to start the server.
 3. Open your browser and navigate to `http://localhost:3000`.
 
@@ -23,7 +23,7 @@ If you prefer to run the source code directly:
 2. Clone this repository:
    ```bash
    git clone <repository_url>
-   cd mendix-vapt-scanner
+   cd universal-vapt-scanner
    ```
 3. Install dependencies:
    ```bash
