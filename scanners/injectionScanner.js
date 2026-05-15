@@ -110,7 +110,7 @@ async function scan(targetUrl, options = {}) {
           timeout: 10000,
           maxRedirects: 5,
           validateStatus: () => true,
-          headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+          headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
         });
         const responseTime = Date.now() - startTime;
 
@@ -179,9 +179,9 @@ async function scan(targetUrl, options = {}) {
       normalUrl.searchParams.set(param, "1");
 
       const [trueResp, falseResp, normalResp] = await Promise.all([
-        axios.get(trueUrl.toString(), { timeout: 8000, validateStatus: () => true, headers: { 'User-Agent': 'MendixVAPTScanner/1.0' } }),
-        axios.get(falseUrl.toString(), { timeout: 8000, validateStatus: () => true, headers: { 'User-Agent': 'MendixVAPTScanner/1.0' } }),
-        axios.get(normalUrl.toString(), { timeout: 8000, validateStatus: () => true, headers: { 'User-Agent': 'MendixVAPTScanner/1.0' } }),
+        axios.get(trueUrl.toString(), { timeout: 8000, validateStatus: () => true, headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' } }),
+        axios.get(falseUrl.toString(), { timeout: 8000, validateStatus: () => true, headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' } }),
+        axios.get(normalUrl.toString(), { timeout: 8000, validateStatus: () => true, headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' } }),
       ]);
 
       const trueLen = (typeof trueResp.data === 'string') ? trueResp.data.length : 0;
@@ -221,7 +221,7 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(targetUrl, {
       timeout: 10000,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
     });
 
     // Find login/search forms to test

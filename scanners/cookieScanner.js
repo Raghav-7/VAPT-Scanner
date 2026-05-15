@@ -8,7 +8,7 @@ async function scan(targetUrl) {
       timeout: 15000,
       maxRedirects: 5,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
     });
 
     const setCookieHeaders = response.headers['set-cookie'] || [];

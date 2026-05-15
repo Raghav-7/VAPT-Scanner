@@ -10,7 +10,7 @@ async function scan(targetUrl, options = {}) {
       timeout: 15000,
       maxRedirects: 5,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
     });
 
     const html = typeof response.data === 'string' ? response.data : '';
@@ -141,7 +141,7 @@ async function scan(targetUrl, options = {}) {
           timeout: 8000,
           validateStatus: () => true,
           headers: {
-            'User-Agent': 'MendixVAPTScanner/1.0',
+            'User-Agent': 'UniversalVAPTScanner/1.0',
             'Content-Type': 'application/json',
             'Origin': 'https://attacker.example.com',
             'Referer': 'https://attacker.example.com/'
@@ -170,7 +170,7 @@ async function scan(targetUrl, options = {}) {
           timeout: 8000,
           validateStatus: () => true,
           headers: {
-            'User-Agent': 'MendixVAPTScanner/1.0',
+            'User-Agent': 'UniversalVAPTScanner/1.0',
             'Content-Type': 'application/json'
           },
           data: '{}'
@@ -182,7 +182,7 @@ async function scan(targetUrl, options = {}) {
           timeout: 8000,
           validateStatus: () => true,
           headers: {
-            'User-Agent': 'MendixVAPTScanner/1.0',
+            'User-Agent': 'UniversalVAPTScanner/1.0',
             'Content-Type': 'application/json',
             'X-Csrf-Token': 'test-token-123'
           },

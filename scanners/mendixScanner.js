@@ -44,7 +44,7 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(targetUrl, {
       timeout: 15000,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
     });
 
     const html = typeof response.data === 'string' ? response.data : '';
@@ -163,7 +163,7 @@ async function scan(targetUrl, options = {}) {
         timeout: 8000,
         maxRedirects: 3,
         validateStatus: () => true,
-        headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
       });
 
       if (response.status === 200 || response.status === 401) {
@@ -207,7 +207,7 @@ async function scan(targetUrl, options = {}) {
       timeout: 8000,
       validateStatus: () => true,
       headers: {
-        'User-Agent': 'MendixVAPTScanner/1.0',
+        'User-Agent': 'UniversalVAPTScanner/1.0',
         'Content-Type': 'application/json'
       }
     });
@@ -236,7 +236,7 @@ async function scan(targetUrl, options = {}) {
       validateStatus: () => true,
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'MendixVAPTScanner/1.0'
+        'User-Agent': 'UniversalVAPTScanner/1.0'
       }
     });
 
@@ -268,7 +268,7 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(targetUrl, {
       timeout: 15000,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
     });
 
     if (typeof response.data === 'string') {
@@ -325,7 +325,7 @@ async function scan(targetUrl, options = {}) {
       timeout: 8000,
       validateStatus: () => true,
       headers: {
-        'User-Agent': 'MendixVAPTScanner/1.0',
+        'User-Agent': 'UniversalVAPTScanner/1.0',
         'Accept': 'application/json'
       }
     });
@@ -340,7 +340,7 @@ async function scan(targetUrl, options = {}) {
       const metaResp = await axios.get(metadataUrl.toString(), {
         timeout: 8000,
         validateStatus: () => true,
-        headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
       });
 
       if (metaResp.status === 200) {

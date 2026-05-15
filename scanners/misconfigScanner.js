@@ -51,7 +51,7 @@ async function scan(targetUrl, options = {}) {
         timeout: 8000,
         maxRedirects: 3,
         validateStatus: () => true,
-        headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
       });
 
       if (response.status === 200) {
@@ -98,7 +98,7 @@ async function scan(targetUrl, options = {}) {
       const response = await axios.get(testUrl.toString(), {
         timeout: 8000,
         validateStatus: () => true,
-        headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
       });
 
       if (response.status === 200 && typeof response.data === 'string') {
@@ -136,7 +136,7 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(testUrl.toString(), {
       timeout: 8000,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
     });
 
     if (typeof response.data === 'string') {
@@ -178,7 +178,7 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(robotsUrl.toString(), {
       timeout: 8000,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
     });
 
     if (response.status === 200 && typeof response.data === 'string') {
@@ -233,7 +233,7 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(targetUrl, {
       timeout: 10000,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'MendixVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
     });
 
     if (typeof response.data === 'string') {
@@ -289,7 +289,7 @@ async function scan(targetUrl, options = {}) {
       timeout: 8000,
       validateStatus: () => true,
       headers: {
-        'User-Agent': 'MendixVAPTScanner/1.0',
+        'User-Agent': 'UniversalVAPTScanner/1.0',
         'Origin': 'https://evil-attacker.com'
       }
     });
@@ -313,7 +313,7 @@ async function scan(targetUrl, options = {}) {
       timeout: 8000,
       validateStatus: () => true,
       headers: {
-        'User-Agent': 'MendixVAPTScanner/1.0',
+        'User-Agent': 'UniversalVAPTScanner/1.0',
         'Origin': 'null'
       }
     });

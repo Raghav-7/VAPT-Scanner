@@ -176,7 +176,7 @@ app.get('/api/scan/:scanId/export-excel', async (req, res) => {
     // Title
     summarySheet.mergeCells('A1:E1');
     const titleCell = summarySheet.getCell('A1');
-    titleCell.value = 'MENDIX VAPT SECURITY ASSESSMENT REPORT';
+    titleCell.value = 'UNIVERSAL VAPT SECURITY ASSESSMENT REPORT';
     titleCell.font = { name: 'Calibri', size: 18, bold: true, color: { argb: colors.header.text } };
     titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: colors.header.bg } };
     titleCell.alignment = { horizontal: 'center', vertical: 'middle' };

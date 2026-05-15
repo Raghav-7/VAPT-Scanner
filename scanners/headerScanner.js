@@ -98,7 +98,7 @@ async function scan(targetUrl) {
       maxRedirects: 5,
       validateStatus: () => true,
       headers: {
-        'User-Agent': 'MendixVAPTScanner/1.0'
+        'User-Agent': 'UniversalVAPTScanner/1.0'
       }
     });
 
