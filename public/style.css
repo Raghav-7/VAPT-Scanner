@@ -113,6 +113,8 @@ body { font-family: var(--font); background: var(--bg-primary); color: var(--tex
 /* Findings */
 .findings-list { display: flex; flex-direction: column; gap: 10px; }
 .finding-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all 0.2s; cursor: pointer; }
+.finding-card.ignored { opacity: 0.6; filter: grayscale(0.5); background: rgba(0,0,0,0.02); }
+.finding-card.ignored:hover { opacity: 0.8; }
 .finding-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
 .finding-header { display: flex; align-items: center; gap: 12px; padding: 16px 20px; }
 .finding-severity { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }

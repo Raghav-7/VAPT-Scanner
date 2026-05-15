@@ -74,7 +74,7 @@ async function scan(targetUrl, options = {}) {
         timeout: 8000,
         maxRedirects: 0, // Don't follow redirects
         validateStatus: () => true,
-        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
       });
 
       // Check if the server tried to fetch or redirect to our canary
@@ -113,13 +113,13 @@ async function scan(targetUrl, options = {}) {
             timeout: 8000,
             maxRedirects: 0,
             validateStatus: () => true,
-            headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+            headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
           }).catch(() => null),
           axios.get(normalUrl.toString(), {
             timeout: 8000,
             maxRedirects: 0,
             validateStatus: () => true,
-            headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+            headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
           }).catch(() => null),
         ]);
 
@@ -198,7 +198,7 @@ async function scan(targetUrl, options = {}) {
         timeout: 8000,
         maxRedirects: 0,
         validateStatus: () => true,
-        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
       });
 
       if (response.status === 200) {

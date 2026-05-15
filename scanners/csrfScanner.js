@@ -10,7 +10,7 @@ async function scan(targetUrl, options = {}) {
       timeout: 15000,
       maxRedirects: 5,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
     });
 
     const html = typeof response.data === 'string' ? response.data : '';
@@ -140,12 +140,10 @@ async function scan(targetUrl, options = {}) {
           url: testUrl.toString(),
           timeout: 8000,
           validateStatus: () => true,
-          headers: {
-            'User-Agent': 'UniversalVAPTScanner/1.0',
+          headers: { 'User-Agent': 'UniversalVAPTScanner/1.0',
             'Content-Type': 'application/json',
             'Origin': 'https://attacker.example.com',
-            'Referer': 'https://attacker.example.com/'
-          },
+            'Referer': 'https://attacker.example.com/', ...(options.headers || {}) },
           data: '{}'
         });
 
@@ -169,10 +167,8 @@ async function scan(targetUrl, options = {}) {
           url: testUrl.toString(),
           timeout: 8000,
           validateStatus: () => true,
-          headers: {
-            'User-Agent': 'UniversalVAPTScanner/1.0',
-            'Content-Type': 'application/json'
-          },
+          headers: { 'User-Agent': 'UniversalVAPTScanner/1.0',
+            'Content-Type': 'application/json', ...(options.headers || {}) },
           data: '{}'
         });
 
@@ -181,11 +177,9 @@ async function scan(targetUrl, options = {}) {
           url: testUrl.toString(),
           timeout: 8000,
           validateStatus: () => true,
-          headers: {
-            'User-Agent': 'UniversalVAPTScanner/1.0',
+          headers: { 'User-Agent': 'UniversalVAPTScanner/1.0',
             'Content-Type': 'application/json',
-            'X-Csrf-Token': 'test-token-123'
-          },
+            'X-Csrf-Token': 'test-token-123', ...(options.headers || {}) },
           data: '{}'
         });
 
@@ -218,9 +212,7 @@ async function scan(targetUrl, options = {}) {
         url: apiUrl.toString(),
         timeout: 8000,
         validateStatus: () => true,
-        headers: {
-          'Content-Type': 'text/plain' // Simple request, no preflight
-        },
+        headers: { 'Content-Type': 'text/plain', ...(options.headers || {}) }, // Simple request, no preflight
         data: '{}'
       });
 

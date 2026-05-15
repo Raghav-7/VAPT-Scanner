@@ -1,21 +1,20 @@
 {
   "name": "universal-vapt-scanner",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "VAPT Scanner for Web Applications — Comprehensive Security Assessment Tool",
   "main": "server.js",
   "bin": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "build:exe": "npx nexe server.js -t windows-x64-14.15.3 -o dist/universal-vapt-scanner.exe -r \"public/**/*\" -r \"scanners/**/*\""
+    "build:exe": "caxa --input . --output dist/universal-vapt-scanner.exe -- \"{{caxa}}/node_modules/.bin/node\" \"{{caxa}}/server.js\""
   },
   "dependencies": {
-    "axios": "^1.7.2",
+    "axios": "^1.16.1",
     "cheerio": "^1.0.0",
     "exceljs": "^4.4.0",
     "express": "^4.21.0",
-    "socket.io": "^4.7.5",
-    "uuid": "^10.0.0"
+    "socket.io": "^4.7.5"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -29,6 +28,8 @@
     ]
   },
   "devDependencies": {
+    "caxa": "^3.0.1",
+    "esbuild": "^0.28.0",
     "pkg": "^5.8.1"
   }
 }

@@ -44,7 +44,7 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(targetUrl, {
       timeout: 15000,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
     });
 
     const html = typeof response.data === 'string' ? response.data : '';
@@ -163,7 +163,7 @@ async function scan(targetUrl, options = {}) {
         timeout: 8000,
         maxRedirects: 3,
         validateStatus: () => true,
-        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
       });
 
       if (response.status === 200 || response.status === 401) {
@@ -206,10 +206,8 @@ async function scan(targetUrl, options = {}) {
     }, {
       timeout: 8000,
       validateStatus: () => true,
-      headers: {
-        'User-Agent': 'UniversalVAPTScanner/1.0',
-        'Content-Type': 'application/json'
-      }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0',
+        'Content-Type': 'application/json', ...(options.headers || {}) }
     });
 
     if (xasResponse.status === 200 && xasResponse.data) {
@@ -234,10 +232,8 @@ async function scan(targetUrl, options = {}) {
     }, {
       timeout: 8000,
       validateStatus: () => true,
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'UniversalVAPTScanner/1.0'
-      }
+      headers: { 'Content-Type': 'application/json',
+        'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
     });
 
     if (sessionResponse.status === 200) {
@@ -268,7 +264,7 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(targetUrl, {
       timeout: 15000,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
     });
 
     if (typeof response.data === 'string') {
@@ -324,10 +320,8 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(odataUrl.toString(), {
       timeout: 8000,
       validateStatus: () => true,
-      headers: {
-        'User-Agent': 'UniversalVAPTScanner/1.0',
-        'Accept': 'application/json'
-      }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0',
+        'Accept': 'application/json', ...(options.headers || {}) }
     });
 
     if (response.status === 200) {
@@ -340,7 +334,7 @@ async function scan(targetUrl, options = {}) {
       const metaResp = await axios.get(metadataUrl.toString(), {
         timeout: 8000,
         validateStatus: () => true,
-        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
       });
 
       if (metaResp.status === 200) {

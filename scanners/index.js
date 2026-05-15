@@ -9,6 +9,8 @@ const accessControlScanner = require('./accessControlScanner');
 const misconfigScanner = require('./misconfigScanner');
 const cryptoScanner = require('./cryptoScanner');
 const mendixScanner = require('./mendixScanner');
+const axios = require('axios');
+const https = require('https');
 
 const SCANNER_MODULES = [
   { name: 'Security Headers', key: 'headers', scanner: headerScanner, icon: '🛡️' },
@@ -21,8 +23,47 @@ const SCANNER_MODULES = [
   { name: 'Access Control', key: 'access', scanner: accessControlScanner, icon: '🚪' },
   { name: 'Security Misconfig', key: 'misconfig', scanner: misconfigScanner, icon: '⚙️' },
   { name: 'Cryptographic Failures', key: 'crypto', scanner: cryptoScanner, icon: '🔐' },
-  { name: 'Mendix-Specific', key: 'mendix', scanner: mendixScanner, icon: '🏗️' },
+  { name: 'Framework-Specific', key: 'mendix', scanner: mendixScanner, icon: '🏗️' },
 ];
+
+/**
+ * Detect the technology stack of the target URL
+ */
+async function detectTechStack(targetUrl, headers = {}) {
+  try {
+    const response = await axios.get(targetUrl, {
+      timeout: 10000,
+      validateStatus: () => true,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+      headers: { ...headers }
+    });
+    const html = response.data.toString().toLowerCase();
+    const respHeaders = response.headers;
+
+    let techStack = 'Generic Web App';
+
+    if (
+      html.includes('mendix') || 
+      html.includes('mxui.js') ||
+      (respHeaders['x-mendix-cloud'] !== undefined) ||
+      (respHeaders['set-cookie'] && respHeaders['set-cookie'].some(c => c.includes('XASID')))
+    ) {
+      techStack = 'Mendix';
+    } else if (html.includes('_next/static') || html.includes('data-reactroot')) {
+      techStack = 'React/Next.js';
+    } else if (html.includes('ng-version') || html.includes('@angular')) {
+      techStack = 'Angular';
+    } else if (html.includes('data-v-') || html.includes('vue.js')) {
+      techStack = 'Vue.js';
+    } else if (respHeaders['x-powered-by'] && respHeaders['x-powered-by'].toLowerCase().includes('express')) {
+      techStack = 'Node.js/Express';
+    }
+
+    return techStack;
+  } catch (err) {
+    return 'Unknown';
+  }
+}
 
 /**
  * Run a full VAPT scan against the target URL
@@ -40,6 +81,20 @@ async function runFullScan(scan, emit) {
 
   const totalModules = modulesToRun.length;
   let completedModules = 0;
+
+  // Detect tech stack
+  emit({
+    type: 'tech_detection_started',
+    data: { message: 'Detecting technology stack...' }
+  });
+
+  const techStack = await detectTechStack(targetUrl, scan.options?.headers || {});
+  scan.techStack = techStack;
+
+  emit({
+    type: 'tech_detection_complete',
+    data: { techStack }
+  });
 
   emit({
     type: 'scan_started',

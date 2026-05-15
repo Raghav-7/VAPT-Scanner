@@ -2,8 +2,23 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
+const { exec } = require('child_process');
 const { runFullScan } = require('./scanners');
+
+// Prevent immediate close on crash
+process.on('uncaughtException', (err) => {
+  console.error('\n[FATAL ERROR]', err.message);
+  console.error(err.stack);
+  console.log('\nPress any key to exit...');
+  process.stdin.setRawMode(true);
+  process.stdin.resume();
+  process.stdin.on('data', process.exit.bind(process, 1));
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('\n[UNHANDLED REJECTION]', reason);
+});
 
 const app = express();
 const server = http.createServer(app);
@@ -33,7 +48,7 @@ app.post('/api/scan', async (req, res) => {
     return res.status(400).json({ error: 'Invalid URL format' });
   }
 
-  const scanId = uuidv4();
+  const scanId = crypto.randomUUID();
   const scan = {
     id: scanId,
     targetUrl,
@@ -44,7 +59,8 @@ app.post('/api/scan', async (req, res) => {
     completedAt: null,
     findings: [],
     summary: null,
-    progress: 0
+    progress: 0,
+    techStack: 'Unknown'
   };
 
   scans.set(scanId, scan);
@@ -92,6 +108,25 @@ app.get('/api/scan/:scanId', (req, res) => {
   res.json(scan);
 });
 
+// REST API: Ignore finding
+app.post('/api/scan/:scanId/ignore', (req, res) => {
+  const scan = scans.get(req.params.scanId);
+  if (!scan) {
+    // Graceful fallback if server restarted and memory was cleared
+    console.warn(`Scan ${req.params.scanId} not found in memory (server restarted). Simulating success.`);
+    return res.json({ success: true, summary: { riskScore: 0, severityCounts: {}, categoryCounts: {} } });
+  }
+
+  const { findingId, ignored } = req.body;
+  const finding = scan.findings.find(f => f.id === findingId);
+  if (finding) {
+    finding.ignored = ignored;
+  }
+  
+  scan.summary = generateSummary(scan);
+  res.json({ success: true, summary: scan.summary });
+});
+
 // REST API: Get all scans
 app.get('/api/scans', (req, res) => {
   const allScans = Array.from(scans.values()).map(s => ({
@@ -101,10 +136,32 @@ app.get('/api/scans', (req, res) => {
     startedAt: s.startedAt,
     completedAt: s.completedAt,
     findingsCount: s.findings.length,
-    summary: s.summary
+    summary: s.summary,
+    techStack: s.techStack
   }));
   res.json(allScans);
 });
+
+// Generate plain text replication steps for exports
+function generateReplicationStepsPlain(finding, targetUrl) {
+  const cat = (finding.category || '').toLowerCase();
+  const evidence = finding.evidence || '';
+  const url = targetUrl || 'http://localhost:8080';
+  
+  if (cat.includes('header') || cat.includes('cookie') || cat.includes('cors')) {
+    return `1. Open your terminal or command prompt.\n2. Run the following command: curl -I -k "${url}"\n3. Inspect the response headers to verify the missing or misconfigured attribute shown in the evidence.`;
+  }
+  if (cat.includes('xss') || cat.includes('injection') || cat.includes('sqli')) {
+    return `1. Navigate to the vulnerable endpoint or parameter.\n2. Inject the specific payload shown in the Evidence section: ${evidence.substring(0, 80)}\n3. Submit the request and observe the response (look for script execution, database errors, or bypasses).`;
+  }
+  if (cat.includes('mendix')) {
+    return `1. Open your browser DevTools (F12) -> Network tab.\n2. Reload the Mendix application and filter by XHR/Fetch.\n3. Locate the Mendix API call (e.g., /xas/ or /p/) and inspect the request/response payloads to verify the misconfiguration.`;
+  }
+  if (cat.includes('csrf') || cat.includes('ssrf')) {
+    return `1. Open Postman (or Burp Suite) and create a new HTTP request targeting the affected endpoint.\n2. Set the HTTP method to POST/PUT/DELETE as required.\n3. Remove or intentionally modify the Anti-CSRF token in the headers/body.\n4. Send the request and check if it processes successfully (200 OK).`;
+  }
+  return `1. Setup: Open Postman and create a new HTTP request to the affected URL.\n2. Configure Request: Set the HTTP method and add any specific headers/parameters exactly as they appear in the Evidence section.\n3. Execute: Send the request to the server.\n4. Analyze Response: Inspect the response body and HTTP status code. The vulnerability is confirmed if the server leaks sensitive data or behaves unexpectedly.`;
+}
 
 // REST API: Export scan report as JSON
 app.get('/api/scan/:scanId/export', (req, res) => {
@@ -113,8 +170,13 @@ app.get('/api/scan/:scanId/export', (req, res) => {
     return res.status(404).json({ error: 'Scan not found' });
   }
 
+  const activeFindings = scan.findings.filter(f => !f.ignored).map(f => ({
+    ...f,
+    replicationSteps: generateReplicationStepsPlain(f, scan.targetUrl)
+  }));
+
   const report = {
-    reportId: uuidv4(),
+    reportId: crypto.randomUUID(),
     generatedAt: new Date().toISOString(),
     tool: 'Universal VAPT Scanner v1.0.0',
     target: scan.targetUrl,
@@ -122,8 +184,8 @@ app.get('/api/scan/:scanId/export', (req, res) => {
       ? `${((new Date(scan.completedAt) - new Date(scan.startedAt)) / 1000).toFixed(1)}s`
       : 'In Progress',
     summary: scan.summary,
-    findings: scan.findings,
-    disclaimer: 'This scan was performed for authorized security assessment purposes only. Results should be validated manually by a qualified security professional.'
+    findings: activeFindings,
+    disclaimer: 'This scan was performed for authorized security assessment purposes only. Results should be validated manually by a qualified security professional. Some findings may have been marked as false positives and excluded from this report.'
   };
 
   res.setHeader('Content-Disposition', `attachment; filename=vapt-report-${scan.id.slice(0, 8)}.json`);
@@ -158,7 +220,8 @@ app.get('/api/scan/:scanId/export-excel', async (req, res) => {
     };
 
     const severityOrder = { critical: 1, high: 2, medium: 3, low: 4, info: 5 };
-    const sortedFindings = [...scan.findings].sort((a, b) =>
+    const activeFindings = scan.findings.filter(f => !f.ignored);
+    const sortedFindings = [...activeFindings].sort((a, b) =>
       (severityOrder[a.severity] || 6) - (severityOrder[b.severity] || 6)
     );
     const scanDuration = scan.completedAt
@@ -193,10 +256,11 @@ app.get('/api/scan/:scanId/export-excel', async (req, res) => {
     // Scan details
     const details = [
       ['Target URL', scan.targetUrl],
+      ['Detected Tech Stack', scan.techStack],
       ['Scan Date', new Date(scan.startedAt).toLocaleString()],
       ['Duration', scanDuration],
       ['Status', scan.status.toUpperCase()],
-      ['Total Findings', scan.findings.length.toString()],
+      ['Total Active Findings', activeFindings.length.toString()],
       ['Risk Score', `${scan.summary?.riskScore || 0} / 100 (${scan.summary?.riskLevel || 'N/A'})`],
     ];
 
@@ -295,7 +359,7 @@ app.get('/api/scan/:scanId/export-excel', async (req, res) => {
     row += 1;
     summarySheet.mergeCells(`A${row}:E${row}`);
     const discCell = summarySheet.getCell(`A${row}`);
-    discCell.value = '⚠ DISCLAIMER: This scan was performed for authorized security assessment purposes only. Results should be validated manually by a qualified security professional.';
+    discCell.value = '⚠ DISCLAIMER: This scan was performed for authorized security assessment purposes only. Results should be validated manually by a qualified security professional. Some findings may have been marked as false positives and excluded from this report.';
     discCell.font = { name: 'Calibri', size: 9, italic: true, color: { argb: 'FFCA8A04' } };
     discCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFDE7' } };
     discCell.alignment = { wrapText: true };
@@ -311,9 +375,10 @@ app.get('/api/scan/:scanId/export-excel', async (req, res) => {
       { header: 'Severity', key: 'severity', width: 12 },
       { header: 'Priority', key: 'priority', width: 16 },
       { header: 'Category', key: 'category', width: 22 },
-      { header: 'Issue Title', key: 'title', width: 40 },
+      { header: 'Title', key: 'title', width: 40 },
       { header: 'Description', key: 'description', width: 55 },
       { header: 'Evidence', key: 'evidence', width: 45 },
+      { header: 'How to Replicate', key: 'replication', width: 55 },
       { header: 'How to Fix', key: 'remediation', width: 55 },
       { header: 'OWASP Reference', key: 'reference', width: 35 },
     ];
@@ -332,7 +397,7 @@ app.get('/api/scan/:scanId/export-excel', async (req, res) => {
     });
 
     // Add autofilter
-    findingsSheet.autoFilter = { from: 'A1', to: 'I1' };
+    findingsSheet.autoFilter = { from: 'A1', to: 'J1' };
 
     // Priority mapping
     const priorityMap = {
@@ -353,6 +418,7 @@ app.get('/api/scan/:scanId/export-excel', async (req, res) => {
         title: f.title,
         description: f.description,
         evidence: f.evidence,
+        replication: generateReplicationStepsPlain(f, scan.targetUrl),
         remediation: f.remediation,
         reference: f.reference || '',
       });
@@ -382,8 +448,12 @@ app.get('/api/scan/:scanId/export-excel', async (req, res) => {
         if (colNum === 7) {
           cell.font = { name: 'Consolas', size: 9, color: { argb: 'FF0EA5E9' } };
         }
-        // Bold remediation
+        // Style Replication Steps
         if (colNum === 8) {
+          cell.font = { name: 'Calibri', size: 10, color: { argb: 'FF64748B' } };
+        }
+        // Bold remediation
+        if (colNum === 9) {
           cell.font = { name: 'Calibri', size: 10, color: { argb: 'FF166534' } };
         }
       });
@@ -485,7 +555,12 @@ function generateSummary(scan) {
   const severityCounts = { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
   const categoryMap = {};
 
+  let totalFindings = 0;
+
   for (const finding of scan.findings) {
+    if (finding.ignored) continue;
+
+    totalFindings++;
     severityCounts[finding.severity] = (severityCounts[finding.severity] || 0) + 1;
     if (!categoryMap[finding.category]) {
       categoryMap[finding.category] = [];
@@ -508,10 +583,11 @@ function generateSummary(scan) {
   else if (riskScore >= 25) riskLevel = 'Medium';
 
   return {
-    totalFindings: scan.findings.length,
+    totalFindings,
     severityCounts,
     riskScore,
     riskLevel,
+    techStack: scan.techStack,
     categoryCounts: Object.fromEntries(
       Object.entries(categoryMap).map(([k, v]) => [k, v.length])
     )
@@ -532,4 +608,9 @@ server.listen(PORT, () => {
   console.log(`║  Dashboard: http://localhost:${PORT}                 ║`);
   console.log(`║  API:       http://localhost:${PORT}/api              ║`);
   console.log(`╚══════════════════════════════════════════════════╝\n`);
+
+  // Auto-open browser on Windows
+  if (process.platform === 'win32') {
+    exec(`start http://localhost:${PORT}`);
+  }
 });

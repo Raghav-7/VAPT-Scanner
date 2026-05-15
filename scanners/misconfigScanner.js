@@ -51,7 +51,7 @@ async function scan(targetUrl, options = {}) {
         timeout: 8000,
         maxRedirects: 3,
         validateStatus: () => true,
-        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
       });
 
       if (response.status === 200) {
@@ -98,7 +98,7 @@ async function scan(targetUrl, options = {}) {
       const response = await axios.get(testUrl.toString(), {
         timeout: 8000,
         validateStatus: () => true,
-        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+        headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
       });
 
       if (response.status === 200 && typeof response.data === 'string') {
@@ -136,7 +136,7 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(testUrl.toString(), {
       timeout: 8000,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
     });
 
     if (typeof response.data === 'string') {
@@ -178,7 +178,7 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(robotsUrl.toString(), {
       timeout: 8000,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
     });
 
     if (response.status === 200 && typeof response.data === 'string') {
@@ -233,7 +233,7 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(targetUrl, {
       timeout: 10000,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
     });
 
     if (typeof response.data === 'string') {
@@ -288,10 +288,8 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(targetUrl, {
       timeout: 8000,
       validateStatus: () => true,
-      headers: {
-        'User-Agent': 'UniversalVAPTScanner/1.0',
-        'Origin': 'https://evil-attacker.com'
-      }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0',
+        'Origin': 'https://evil-attacker.com', ...(options.headers || {}) }
     });
 
     const corsOrigin = response.headers['access-control-allow-origin'];
@@ -312,10 +310,8 @@ async function scan(targetUrl, options = {}) {
     const nullResp = await axios.get(targetUrl, {
       timeout: 8000,
       validateStatus: () => true,
-      headers: {
-        'User-Agent': 'UniversalVAPTScanner/1.0',
-        'Origin': 'null'
-      }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0',
+        'Origin': 'null', ...(options.headers || {}) }
     });
 
     if (nullResp.headers['access-control-allow-origin'] === 'null') {

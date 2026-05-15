@@ -25,7 +25,7 @@ async function scan(targetUrl, options = {}) {
     const response = await axios.get(targetUrl, {
       timeout: 15000,
       validateStatus: () => true,
-      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0' }
+      headers: { 'User-Agent': 'UniversalVAPTScanner/1.0', ...(options.headers || {}) }
     });
 
     // Check URL parameters for sensitive data

@@ -1,7 +1,7 @@
 // Universal VAPT Scanner — Remediation Guide
 // Provides detailed, Mendix-specific fix instructions for each vulnerability category
 
-const REMEDIATION_GUIDES = {
+const REMEDIATION_GUIDES_MENDIX = {
   'Security Headers': {
     overview: 'Security headers instruct browsers how to handle your app content. Missing headers leave the app vulnerable to XSS, clickjacking, and data theft.',
     steps: [
@@ -350,16 +350,116 @@ proxy_hide_header X-Mendix-Cloud;`,
   }
 };
 
+const REMEDIATION_GUIDES_GENERIC = {
+  'Security Headers': {
+    overview: 'Security headers instruct browsers how to handle your app content.',
+    steps: [
+      {
+        title: 'Configure via Web Server (Nginx/Apache) or Application Middleware',
+        code: `// Express.js example using Helmet
+const helmet = require('helmet');
+app.use(helmet());`
+      }
+    ]
+  },
+  'SSL/TLS': {
+    overview: 'TLS encrypts all data between the browser and server.',
+    steps: [
+      {
+        title: 'Enable HTTPS',
+        description: 'Use Let\'s Encrypt or your cloud provider to enable HTTPS and force redirects from HTTP.'
+      }
+    ]
+  },
+  'Cookie Security': {
+    overview: 'Cookies store session tokens. Secure them to prevent attacks.',
+    steps: [
+      {
+        title: 'Set Secure and HttpOnly Flags',
+        description: 'Ensure session cookies always have Secure, HttpOnly, and SameSite=Strict flags enabled.'
+      }
+    ]
+  },
+  'XSS': {
+    overview: 'Cross-Site Scripting allows attackers to execute malicious JavaScript.',
+    steps: [
+      {
+        title: 'Sanitize Input and Use Safe APIs',
+        description: 'Avoid innerHTML or dangerouslySetInnerHTML. Use DOMPurify for HTML content.'
+      }
+    ]
+  },
+  'Injection': {
+    overview: 'Injection attacks insert malicious queries.',
+    steps: [
+      {
+        title: 'Use Parameterized Queries / ORMs',
+        description: 'Never concatenate user input directly into SQL, NoSQL, or command strings. Always use prepared statements.'
+      }
+    ]
+  },
+  'SSRF': {
+    overview: 'SSRF tricks your server into making internal requests.',
+    steps: [
+      {
+        title: 'Validate Outbound URLs',
+        description: 'Use strict allowlists for domains your server is allowed to make outbound requests to. Block internal IP ranges.'
+      }
+    ]
+  },
+  'CSRF': {
+    overview: 'CSRF tricks users into performing unintended actions.',
+    steps: [
+      {
+        title: 'Use Anti-CSRF Tokens',
+        description: 'Implement Anti-CSRF tokens for all state-changing requests or rely on SameSite=Strict cookies.'
+      }
+    ]
+  },
+  'Broken Access Control': {
+    overview: 'Access control failures let unauthorized users view restricted data.',
+    steps: [
+      {
+        title: 'Enforce Server-Side Checks',
+        description: 'Always verify the user\'s identity and permissions on the server for every request. Do not rely on hiding UI elements.'
+      }
+    ]
+  },
+  'Security Misconfiguration': {
+    overview: 'Misconfigurations expose sensitive files or debug information.',
+    steps: [
+      {
+        title: 'Disable Debug Modes in Production',
+        description: 'Ensure stack traces are not shown to users. Remove default files and block access to .git or .env files.'
+      }
+    ]
+  },
+  'Cryptographic Failures': {
+    overview: 'Cryptographic failures expose sensitive data.',
+    steps: [
+      {
+        title: 'Use Strong Algorithms',
+        description: 'Use industry-standard encryption. Never hardcode secrets in source code; use environment variables or secret managers.'
+      }
+    ]
+  }
+};
+
 // Get remediation guide for a finding
-function getRemediationGuide(finding) {
-  const guide = REMEDIATION_GUIDES[finding.category];
+function getRemediationGuide(finding, techStack) {
+  let guides = REMEDIATION_GUIDES_GENERIC;
+  if (techStack === 'Mendix') {
+    guides = REMEDIATION_GUIDES_MENDIX;
+  }
+  
+  const guide = guides[finding.category];
   if (!guide) return null;
   return guide;
 }
 
 // Render remediation HTML for a finding
-function renderRemediationHTML(finding) {
-  const guide = getRemediationGuide(finding);
+function renderRemediationHTML(finding, techStack) {
+  const guide = getRemediationGuide(finding, techStack);
   if (!guide) {
     return `<div class="fix-section"><div class="fix-text">${escapeHtml(finding.remediation)}</div></div>`;
   }

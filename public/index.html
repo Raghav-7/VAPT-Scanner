@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Universal VAPT Scanner — Security Assessment Dashboard</title>
-  <meta name="description" content="Comprehensive Vulnerability Assessment and Penetration Testing tool for Mendix applications. OWASP Top 10 coverage with Mendix-specific security checks.">
+  <meta name="description" content="Comprehensive Vulnerability Assessment and Penetration Testing tool for Web applications. OWASP Top 10 coverage with technology-specific security checks.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -35,7 +35,7 @@
           </svg>
         </div>
         <div class="logo-text">
-          <span class="logo-title">Mendix VAPT</span>
+          <span class="logo-title">Web App VAPT</span>
           <span class="logo-subtitle">Security Scanner</span>
         </div>
       </div>
@@ -58,13 +58,13 @@
           <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
           Target Configuration
         </h1>
-        <p class="section-desc">Enter the Mendix application URL to scan for vulnerabilities</p>
+        <p class="section-desc">Enter the application URL to scan for vulnerabilities</p>
       </div>
 
       <div class="target-input-group">
         <div class="input-wrapper">
           <svg class="input-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input type="url" id="target-url" class="target-input" placeholder="https://your-mendix-app.mendixcloud.com" autocomplete="url">
+          <input type="url" id="target-url" class="target-input" placeholder="https://your-app.com" autocomplete="url">
           <button class="btn btn-primary btn-scan" id="btn-scan" onclick="startScan()">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             <span>Start Scan</span>
@@ -126,14 +126,27 @@
         </div>
         <div class="module-card selected" data-module="mendix" onclick="toggleModule(this)">
           <span class="module-icon">🏗️</span>
-          <span class="module-name">Mendix-Specific</span>
+          <span class="module-name">Framework-Specific</span>
           <span class="module-check">✓</span>
         </div>
       </div>
 
-      <div class="disclaimer">
+      <!-- Advanced Options (Authentication) -->
+      <div class="advanced-options" style="margin-top: 16px;">
+        <div class="advanced-toggle" onclick="document.getElementById('advanced-panel').classList.toggle('hidden')" style="cursor: pointer; display: inline-flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500;">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Advanced Options (Authentication / Cookies)
+        </div>
+        <div id="advanced-panel" class="hidden" style="margin-top: 12px; padding: 16px; background: rgba(0,0,0,0.02); border: 1px solid var(--border); border-radius: var(--radius-sm);">
+          <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Custom Headers</label>
+          <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Paste headers (like Cookies or Authorization tokens) to scan behind logins. Format: <code>Header: Value</code> (one per line).</p>
+          <textarea id="custom-headers" style="width: 100%; height: 80px; padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-family: var(--mono); font-size: 12px; resize: vertical;" placeholder="Cookie: session_id=12345&#10;Authorization: Bearer my-token"></textarea>
+        </div>
+      </div>
+
+      <div class="disclaimer" style="margin-top: 20px;">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <span><strong>Ready to scan:</strong> Works with Mendix Cloud, AWS/Azure, On-Premises, and Localhost. Please ensure you own or have permission to scan the target environment.</span>
+        <span><strong>Ready to scan:</strong> Works with all cloud deployments (AWS, Azure, GCP, etc.), On-Premises, and Localhost. Please ensure you own or have permission to scan the target environment.</span>
       </div>
     </section>
 
@@ -222,6 +235,12 @@
 
       <!-- Category Filter -->
       <div class="category-filter" id="category-filter"></div>
+
+      <!-- Disclaimer -->
+      <div class="disclaimer" style="margin-bottom: 20px; background: rgba(202, 138, 4, 0.05); border-color: rgba(202, 138, 4, 0.3);">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span><strong>Note on Automated Findings:</strong> Automated scanners often flag intended functionality (like HTTP GET forms or region cookies) as vulnerabilities. Please manually verify findings and use the "Mark False Positive" button to exclude irrelevant items from your final reports.</span>
+      </div>
 
       <!-- Findings List -->
       <div class="findings-list" id="findings-list"></div>
